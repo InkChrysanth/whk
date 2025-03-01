@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          persist-credentials: true
+          fetch-depth: 0
 
       - name: Install dependencies
         run: |
@@ -25,23 +25,31 @@ jobs:
             fonts-noto-cjk \
             fonts-noto-color-emoji \
             fonts-noto-extra
-          
-          # 强制刷新字体缓存
           fc-cache -f -v
-          mkdir -p ~/.config/fontconfig
-          cp .fonts.conf ~/.config/fontconfig/
 
-      - name: Convert Markdown to PDF (Fixed)
+      - name: Convert Markdown to PDF (Safe Mode)
         run: |
-          find . -name "*.md" -type f | while read -r md_file; do
-            pdf_file="${md_file%.md}.pdf"
+          # 设置安全解析模式
+          IFS=$'\n'
+          mkdir -p ./output_pdfs
+          
+          # 使用 find 的安全模式
+          find . -name "*.md" -type f -print0 | while IFS= read -r -d '' md_file; do
+            echo "Processing: $md_file"
+            
+            # 生成安全文件名
+            safe_name=$(basename "$md_file" .md | tr ' ' '_' | tr -cd '[:alnum:]._-')
+            pdf_file="./output_pdfs/${safe_name}.pdf"
+            
+            # 显示调试信息
+            echo "Input file exists? $(test -f "$md_file" && echo YES || echo NO)"
+            echo "Output path: $pdf_file"
+            
+            # 执行转换
             pandoc "$md_file" \
-              --pdf-engine=xelatex \          # 唯一指定 PDF 引擎
+              --pdf-engine=xelatex \
               -V mainfont="Noto Sans CJK SC" \
-              -V sansfont="Noto Sans CJK SC" \
-              -V monofont="Noto Sans Mono CJK SC" \
               -V geometry:margin=1in \
-              --variable=emoji-font:"Noto Color Emoji" \
               -o "$pdf_file"
           done
 
@@ -49,11 +57,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config --global user.name "GitHub Actions Bot"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "PDF Generator"
+          git config --global user.email "pdf-generator@users.noreply.github.com"
           git config --global core.quotepath false
           
-          git add .
-          git commit -m "[skip ci] Auto-generated PDFs"
+          git add ./output_pdfs/
+          git commit -m "[skip ci] Auto-generated PDFs (safe mode)"
           git pull --rebase
           git push origin HEAD:main

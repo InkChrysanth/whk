@@ -18,7 +18,8 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y pandoc texlive-xetex fonts-noto-cjk
+          sudo apt-get install -y pandoc texlive-xetex \
+            fonts-noto-cjk fonts-noto-color-emoji
 
       - name: Convert Markdown to PDF
         run: |
@@ -26,15 +27,28 @@ jobs:
             pdf_file="${md_file%.md}.pdf"
             pandoc "$md_file" \
               --pdf-engine=xelatex \
-              -V mainfont="Noto Sans CJK JP" \
+              -V mainfont="Noto Sans CJK SC" \
+              -V sansfont="Noto Sans CJK JP" \
+              -V monofont="Noto Sans Mono CJK KR" \
+              -V fontsize=12pt \
               -V geometry:margin=1in \
+              --variable=emoji-font:"Noto Color Emoji" \
+              --metadata=lang:"zh-CN" \
               -o "$pdf_file"
           done
 
       - name: Commit and push PDFs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
+          # 配置 Git 使用 HTTPS 认证
+          git config --global http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n x-access-token:$GITHUB_TOKEN | base64)"
+          
+          # 修复文件名编码问题
+          git config --global core.quotepath false
+          
           git add .
+          git status
           git commit -m "[skip ci] Auto-generated PDFs from Markdown"
-          git push
+          git pull --rebase
+          git push origin HEAD:main

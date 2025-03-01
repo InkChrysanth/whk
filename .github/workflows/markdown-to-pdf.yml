@@ -25,24 +25,23 @@ jobs:
             fonts-noto-cjk \
             fonts-noto-color-emoji \
             fonts-noto-extra
-
+          
+          # 强制刷新字体缓存
           fc-cache -f -v
           mkdir -p ~/.config/fontconfig
           cp .fonts.conf ~/.config/fontconfig/
 
-      - name: Convert Markdown to PDF
+      - name: Convert Markdown to PDF (Fixed)
         run: |
           find . -name "*.md" -type f | while read -r md_file; do
             pdf_file="${md_file%.md}.pdf"
             pandoc "$md_file" \
-              --pdf-engine=xelatex \
+              --pdf-engine=xelatex \          # 唯一指定 PDF 引擎
               -V mainfont="Noto Sans CJK SC" \
               -V sansfont="Noto Sans CJK SC" \
               -V monofont="Noto Sans Mono CJK SC" \
-              -V CJKmainfont="Noto Sans CJK SC" \
               -V geometry:margin=1in \
               --variable=emoji-font:"Noto Color Emoji" \
-              --latex-engine=xelatex \
               -o "$pdf_file"
           done
 
@@ -50,18 +49,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # 配置用户身份
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # 配置编码和认证
           git config --global core.quotepath false
-          git config --global http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n x-access-token:$GITHUB_TOKEN | base64)"
-
-          # 提交更改
-          git add .
-          git commit -m "[skip ci] Auto-generated PDFs from Markdown"
           
-          # 处理可能的冲突
-          git pull --rebase origin main
+          git add .
+          git commit -m "[skip ci] Auto-generated PDFs"
+          git pull --rebase
           git push origin HEAD:main

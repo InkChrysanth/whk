@@ -2,35 +2,39 @@ name: Convert Markdown to PDF
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    paths:
+      - '**.md'
 
 jobs:
   convert:
     runs-on: ubuntu-latest
 
     steps:
-    # 检出代码
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-    # 安装 pandoc 和 LaTeX 环境
-    - name: Install pandoc and LaTeX
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-latex-base texlive-latex-extra
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc texlive-xetex fonts-noto-cjk
 
-    # 转换 Markdown 文件为 PDF
-    - name: Convert markdown to PDF
-      run: |
-        pandoc 摘录本.md -o 摘录本.pdf --pdf-engine=xelatex
+      - name: Convert Markdown to PDF
+        run: |
+          find . -name "*.md" -type f | while read -r md_file; do
+            pdf_file="${md_file%.md}.pdf"
+            pandoc "$md_file" \
+              --pdf-engine=xelatex \
+              -V mainfont="Noto Sans CJK JP" \
+              -V geometry:margin=1in \
+              -o "$pdf_file"
+          done
 
-    # 上传生成的 PDF 文件
-    - name: Upload PDF artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: output-pdf
-        path: "摘录本.pdf"
+      - name: Commit and push PDFs
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "[skip ci] Auto-generated PDFs from Markdown"
+          git push

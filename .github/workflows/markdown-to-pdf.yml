@@ -30,7 +30,7 @@ jobs:
 
     # 上传生成的 PDF 文件
     - name: Upload PDF artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: output-pdf
         path: "摘录本.pdf"

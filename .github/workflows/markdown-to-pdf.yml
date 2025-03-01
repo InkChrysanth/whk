@@ -123,7 +123,7 @@ jobs:
       # ========== 日志收集 ==========
       - name: 上传调试日志
         if: ${{ always() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: debug-artifacts
           path: |

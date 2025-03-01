@@ -1,4 +1,4 @@
-name: Smart PDF Converter
+name: Auto PDF Converter
 
 on:
   push:
@@ -8,64 +8,124 @@ on:
 jobs:
   convert:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
-      - name: Checkout with SSH
+      # ========== SSH 环境配置 ==========
+      - name: 配置 SSH 基础环境
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openssh-client git
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+      # ========== 代码检出 ==========
+      - name: 检出代码库
         uses: actions/checkout@v4
         with:
           ssh-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          path: src
           fetch-depth: 0
 
-      - name: Setup Font Ecosystem
+      # ========== 依赖安装 ==========
+      - name: 安装转换依赖
         run: |
-          sudo apt-get update
           sudo apt-get install -y \
             pandoc \
             texlive-xetex \
-            fonts-noto-core \
+            texlive-latex-recommended \
             fonts-noto-cjk \
-            fonts-noto-extra \
-            fonts-noto-color-emoji
-          fc-cache -f -v
+            fonts-noto-color-emoji \
+            fonts-arphic-ukai
 
-      - name: Create LaTeX Template
+          # 验证字体安装
+          fc-list : family | grep -E 'Noto|AR PL'
+
+      # ========== LaTeX 模板 ==========
+      - name: 配置 LaTeX 模板
         run: |
           mkdir -p .latex
-          cat <<EOF > .latex/template.tex
-          \\usepackage{xeCJK}
-          \\setCJKmainfont{Noto Sans CJK SC}[BoldFont=Noto Sans CJK SC Bold]
-          \\setCJKsansfont{Noto Sans CJK SC}
-          \\setCJKmonofont{Noto Sans Mono CJK SC}
-          \\usepackage{emoji}
-          \\setemojifont{Noto Color Emoji}[Renderer=HarfBuzz]
+          cat << 'EOF' > .latex/template.tex
+          \documentclass{article}
+          \usepackage{xeCJK}
+          \setCJKmainfont{Noto Sans CJK SC}[
+            Path=/usr/share/fonts/opentype/noto/,
+            BoldFont=NotoSansCJK-Bold,
+            ItalicFont=NotoSansCJK-Thin
+          ]
+          \usepackage{emoji}
+          \setemojifont{Noto Color Emoji}[Renderer=HarfBuzz]
+          \usepackage{geometry}
+          \geometry{a4paper, margin=1in}
+          \begin{document}
+          $body$
+          \end{document}
           EOF
 
-      - name: Convert with CJK Support
+      # ========== 文件转换 ==========
+      - name: 转换 Markdown 到 PDF
+        working-directory: ./src
         run: |
           mkdir -p output_pdfs
-          find . -name "*.md" -type f -print0 | while IFS= read -r -d '' md_file; do
-            pdf_name="$(basename "$md_file" .md | iconv -f utf8 -t ascii//TRANSLIT).pdf"
-            pandoc "$md_file" \
-              --template=.latex/template.tex \
+          
+          find . -name "*.md" -print0 | while IFS= read -r -d '' file; do
+            # 生成安全文件名
+            safe_name=$(basename "$file" .md | iconv -f utf8 -t ascii//TRANSLIT | tr ' ' '_')
+            
+            echo "▸ 正在转换: $file → output_pdfs/${safe_name}.pdf"
+            
+            pandoc "$file" \
+              --template=../.latex/template.tex \
               --pdf-engine=xelatex \
-              -V geometry:margin=1.5cm \
-              -o "output_pdfs/${pdf_name}"
+              --resource-path=$(dirname "$file") \
+              -o "output_pdfs/${safe_name}.pdf" \
+              --verbose 2>&1 | tee pandoc.log
+
+            # 失败时中断
+            if [ ! -f "output_pdfs/${safe_name}.pdf" ]; then
+              echo "❌ 转换失败"
+              cat pandoc.log
+              exit 1
+            fi
           done
 
-      - name: Deploy PDFs
+      # ========== 提交和推送 ==========
+      - name: 推送生成的 PDF
+        working-directory: ./src
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SSH_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         run: |
-          eval "$(ssh-agent -s)"
-          ssh-add - <<< "$SSH_PRIVATE_KEY"
-          
+          # 配置 SSH 密钥
+          echo "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts
+
+          # 配置 Git 身份
           git config --global user.name "PDF Bot"
           git config --global user.email "pdf-bot@users.noreply.github.com"
+          git config --global core.quotepath false
+
+          # 添加并提交更改
           git add output_pdfs/
-          
-          # 智能提交：仅当有变更时提交
           if ! git diff-index --quiet HEAD --; then
             git commit -m "[PDF] Auto-generated $(date +'%Y%m%d-%H%M%S')"
-            git pull --rebase
+            git pull --rebase origin main
             git push origin HEAD:main
+            echo "✅ 已成功推送 PDF 文件"
+          else
+            echo "🟢 没有需要提交的变更"
           fi
+
+          # 清理密钥
+          rm -f ~/.ssh/id_ed25519
+
+      # ========== 日志收集 ==========
+      - name: 上传调试日志
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: debug-artifacts
+          path: |
+            src/pandoc.log
+            src/output_pdfs/*.pdf

@@ -15,7 +15,8 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-fonts-extra fonts-noto-cjk fonts-noto-color-emoji
+          sudo apt-get install -y pandoc texlive-xetex texlive-lang-chinese texlive-fonts-recommended texlive-fonts-extra fonts-noto-cjk fonts-noto-color-emoji
+      
 
       - name: Compile Markdown to PDF
         run: |

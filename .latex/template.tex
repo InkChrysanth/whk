@@ -1,0 +1,28 @@
+\documentclass[$if(documentclass)$$documentclass$$else$article$endif$]{$if(class)$$class$$else$scrartcl$endif$}
+\usepackage{xeCJK}
+\setCJKmainfont[
+  Path = /usr/share/fonts/opentype/noto/,
+  Extension = .otf,
+  BoldFont = NotoSansCJK-Bold,
+  ItalicFont = NotoSansCJK-Thin
+]{NotoSansCJK-Regular}
+
+\usepackage{emoji}
+\setemojifont{Noto Color Emoji}[Renderer=HarfBuzz]
+
+% 其他必要包
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+
+$if(title)$
+\title{$title$$if(thanks)$\thanks{$thanks$}$endif$}
+$endif$
+
+\begin{document}
+$if(title)$
+\maketitle
+$endif$
+
+$body$
+\end{document}

@@ -1,0 +1,36 @@
+name: Convert Markdown to PDF
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 检出代码
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    # 安装 pandoc 和 LaTeX 环境
+    - name: Install pandoc and LaTeX
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-generic-recommended
+
+    # 转换 Markdown 文件为 PDF
+    - name: Convert markdown to PDF
+      run: |
+        pandoc "摘录本.md" -o "摘录本.pdf"
+
+    # 上传生成的 PDF 文件
+    - name: Upload PDF artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: output-pdf
+        path: "摘录本.pdf"

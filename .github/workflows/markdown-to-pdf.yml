@@ -15,7 +15,7 @@ jobs:
     steps:
     # 检出代码
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@latest
 
     # 安装 pandoc 和 LaTeX 环境
     - name: Install pandoc and LaTeX
@@ -30,7 +30,7 @@ jobs:
 
     # 上传生成的 PDF 文件
     - name: Upload PDF artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@latest
       with:
         name: output-pdf
         path: "摘录本.pdf"

@@ -13,13 +13,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          persist-credentials: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
 
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y pandoc texlive-xetex \
-            fonts-noto-cjk fonts-noto-color-emoji
+          sudo apt-get install -y \
+            pandoc \
+            texlive-xetex \
+            fonts-noto-cjk \
+            fonts-noto-color-emoji \
+            fonts-noto-extra
+
+          fc-cache -f -v
+          mkdir -p ~/.config/fontconfig
+          cp .fonts.conf ~/.config/fontconfig/
 
       - name: Convert Markdown to PDF
         run: |
@@ -28,12 +37,12 @@ jobs:
             pandoc "$md_file" \
               --pdf-engine=xelatex \
               -V mainfont="Noto Sans CJK SC" \
-              -V sansfont="Noto Sans CJK JP" \
-              -V monofont="Noto Sans Mono CJK KR" \
-              -V fontsize=12pt \
+              -V sansfont="Noto Sans CJK SC" \
+              -V monofont="Noto Sans Mono CJK SC" \
+              -V CJKmainfont="Noto Sans CJK SC" \
               -V geometry:margin=1in \
               --variable=emoji-font:"Noto Color Emoji" \
-              --metadata=lang:"zh-CN" \
+              --latex-engine=xelatex \
               -o "$pdf_file"
           done
 
@@ -41,14 +50,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # 配置 Git 使用 HTTPS 认证
-          git config --global http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n x-access-token:$GITHUB_TOKEN | base64)"
+          # 配置用户身份
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # 修复文件名编码问题
+          # 配置编码和认证
           git config --global core.quotepath false
-          
+          git config --global http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n x-access-token:$GITHUB_TOKEN | base64)"
+
+          # 提交更改
           git add .
-          git status
           git commit -m "[skip ci] Auto-generated PDFs from Markdown"
-          git pull --rebase
+          
+          # 处理可能的冲突
+          git pull --rebase origin main
           git push origin HEAD:main

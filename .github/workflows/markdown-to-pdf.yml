@@ -21,7 +21,7 @@ jobs:
     - name: Install pandoc and LaTeX
       run: |
         sudo apt-get update
-        sudo apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-generic-recommended
+        sudo apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-latex-base texlive-latex-extra
 
     # 转换 Markdown 文件为 PDF
     - name: Convert markdown to PDF
@@ -32,5 +32,5 @@ jobs:
     - name: Upload PDF artifact
       uses: actions/upload-artifact@v4
       with:
-        name: output-pdf
+        name: upload-pdf
         path: "摘录本.pdf"

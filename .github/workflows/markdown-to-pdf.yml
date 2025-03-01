@@ -1,4 +1,4 @@
-name: Convert Markdown to PDF
+name: Smart PDF Converter
 
 on:
   push:
@@ -10,58 +10,62 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout with SSH
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          ssh-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           fetch-depth: 0
 
-      - name: Install dependencies
+      - name: Setup Font Ecosystem
         run: |
           sudo apt-get update
           sudo apt-get install -y \
             pandoc \
             texlive-xetex \
+            fonts-noto-core \
             fonts-noto-cjk \
-            fonts-noto-color-emoji \
-            fonts-noto-extra
+            fonts-noto-extra \
+            fonts-noto-color-emoji
           fc-cache -f -v
 
-      - name: Convert Markdown to PDF (Safe Mode)
+      - name: Create LaTeX Template
         run: |
-          # 设置安全解析模式
-          IFS=$'\n'
-          mkdir -p ./output_pdfs
-          
-          # 使用 find 的安全模式
+          mkdir -p .latex
+          cat <<EOF > .latex/template.tex
+          \\usepackage{xeCJK}
+          \\setCJKmainfont{Noto Sans CJK SC}[BoldFont=Noto Sans CJK SC Bold]
+          \\setCJKsansfont{Noto Sans CJK SC}
+          \\setCJKmonofont{Noto Sans Mono CJK SC}
+          \\usepackage{emoji}
+          \\setemojifont{Noto Color Emoji}[Renderer=HarfBuzz]
+          EOF
+
+      - name: Convert with CJK Support
+        run: |
+          mkdir -p output_pdfs
           find . -name "*.md" -type f -print0 | while IFS= read -r -d '' md_file; do
-            echo "Processing: $md_file"
-            
-            # 生成安全文件名
-            safe_name=$(basename "$md_file" .md | tr ' ' '_' | tr -cd '[:alnum:]._-')
-            pdf_file="./output_pdfs/${safe_name}.pdf"
-            
-            # 显示调试信息
-            echo "Input file exists? $(test -f "$md_file" && echo YES || echo NO)"
-            echo "Output path: $pdf_file"
-            
-            # 执行转换
+            pdf_name="$(basename "$md_file" .md | iconv -f utf8 -t ascii//TRANSLIT).pdf"
             pandoc "$md_file" \
+              --template=.latex/template.tex \
               --pdf-engine=xelatex \
-              -V mainfont="Noto Sans CJK SC" \
-              -V geometry:margin=1in \
-              -o "$pdf_file"
+              -V geometry:margin=1.5cm \
+              -o "output_pdfs/${pdf_name}"
           done
 
-      - name: Commit and push PDFs
+      - name: Deploy PDFs
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SSH_PRIVATE_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         run: |
-          git config --global user.name "PDF Generator"
-          git config --global user.email "pdf-generator@users.noreply.github.com"
-          git config --global core.quotepath false
+          eval "$(ssh-agent -s)"
+          ssh-add - <<< "$SSH_PRIVATE_KEY"
           
-          git add ./output_pdfs/
-          git commit -m "[skip ci] Auto-generated PDFs (safe mode)"
-          git pull --rebase
-          git push origin HEAD:main
+          git config --global user.name "PDF Bot"
+          git config --global user.email "pdf-bot@users.noreply.github.com"
+          git add output_pdfs/
+          
+          # 智能提交：仅当有变更时提交
+          if ! git diff-index --quiet HEAD --; then
+            git commit -m "[PDF] Auto-generated $(date +'%Y%m%d-%H%M%S')"
+            git pull --rebase
+            git push origin HEAD:main
+          fi

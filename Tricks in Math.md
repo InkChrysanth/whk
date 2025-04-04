@@ -258,18 +258,18 @@ $$
 $\text{圆:}
 \begin{cases}
 x=r\cos t \\
-y=r\sin t & & 
+y=r\sin t 
 \end{cases} $
 
 $\text{椭圆:}
 \begin{cases}
 x=a\cos t \\
-y=b\sin t & & 
+y=b\sin t 
 \end{cases} $​
 
 对于直线，我们令 $t$ 为直线上动点 $A$ 到定点 $M(x_0, y_0)$ 的距离
 
-那么，经过点 $ M $，与 $x$轴夹角为 $\alpha$ 的直线可以表示为$\begin{cases} x=x_0+t\cos \alpha \\ y=y_0+t\sin \alpha && \end{cases} $
+那么，经过点 $ M $，与 $x$轴夹角为 $\alpha$ 的直线可以表示为$ \begin{cases} x=x_0+t\cos \alpha \\ y=y_0+t\sin \alpha && \end{cases} $
 
 
 

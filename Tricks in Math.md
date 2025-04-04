@@ -1,4 +1,4 @@
-# Tricks in Math (数学中的二级结论)
+# Tricks in Math 数学中的二级结论
 
 > Informatik verbindet dich und mich.
 >
@@ -38,7 +38,7 @@ $\Delta=m^2+4(m-1)\geq 0 \;\Rightarrow\; m \geq 2\sqrt{2}-2$
 
 **几何级数**
 $$
-\dfrac{1}{1-x} = \sum^{\infin}_{n=0} x^n= 1+ x +x^2+ \cdots +x^n +\cdots \quad \forall x: \left| x \right| < 1
+\dfrac{1}{1-x} = \sum^{\infty}_{n=0} x^n= 1+ x +x^2+ \cdots +x^n +\cdots \quad \forall x: \left| x \right| < 1
 $$
 **二项式级数**
 $$
@@ -46,11 +46,11 @@ $$
 $$
 **指数函数**
 $$
-e^{x} = \sum^{\infin}_{n=0} \dfrac{x^n}{n!}= 1 + x + \dfrac{x^2}{2!} + \dfrac{x^3}{3!} + \cdots +\dfrac{x^n}{n!} +\cdots \quad \forall x
+e^{x} = \sum^{\infty}_{n=0} \dfrac{x^n}{n!}= 1 + x + \dfrac{x^2}{2!} + \dfrac{x^3}{3!} + \cdots +\dfrac{x^n}{n!} +\cdots \quad \forall x
 $$
 **自然对数**
 $$
-\ln(1+x) = \displaystyle\sum^{\infin}_{n=1} \dfrac{(-1)^{n+1}}n x^n = x - \dfrac{x^2}2 + \dfrac{x^3}3 - \cdots +\dfrac{(-1)^{n+1}}n x^n +\cdots \quad \forall x\in (-1,1]
+\ln(1+x) = \displaystyle\sum^{\infty}_{n=1} \dfrac{(-1)^{n+1}}n x^n = x - \dfrac{x^2}2 + \dfrac{x^3}3 - \cdots +\dfrac{(-1)^{n+1}}n x^n +\cdots \quad \forall x\in (-1,1]
 $$
 **三角函数**
 $$
@@ -60,6 +60,7 @@ $$
 \tan x &= \sum^{\infty}_{n=1} \frac{B_{2n} (-4)^n \left(1-4^n\right)}{(2n-1)!} x^{2n-1} = x + \cfrac{x^3}{3} + \cfrac{2 x^5}{15} + \cdots \quad \forall x:|x| < \cfrac{\pi}{2}\\[6pt]
 \end{aligned}
 $$
+
 
 
 ### 帕德近似
@@ -80,6 +81,29 @@ $$
 \ln x&>\dfrac{2x-2}{1+x} \quad \forall x>1
 \end{aligned}
 $$
+
+### 洛必达法则
+
+**简介**
+
+洛必达法则（L'Hôpital's rule）是利用导数来计算具有不定型的极限的方法。（实际是伯努利发现的qwq）
+
+**结论**
+
+当 $\displaystyle\lim_{x \to c}{f(x)}=\displaystyle\lim_{x \to c}{g(x)}=0$ 或 $\lim_{x \to c}{|f(x)|}=\lim_{x \to c}{|g(x)|}=\infty$ 其中一者成立，此时有
+$$
+\lim_{x \to c}\dfrac{f(x)}{g(x)}=\lim_{x\to c}\dfrac{f^{'}(x)}{g{'}(x)}
+$$
+如果式子不满足分式形式，也可以通过运算转为分数形式。
+$$
+\lim_{x \to c} f(x) = 0,\  \lim_{x \to c} g(x) = \infty\\
+\lim_{x \to c} f(x)g(x) = \lim_{x \to c} \frac{f(x)}{1/g(x)} \ 或 \ \lim_{x \to c} \frac{g(x)}{1/f(x)}
+$$
+
+$$
+\lim_{x \to c} f(x) = \infty,\  \lim_{x \to c} g(x) = \infty\\ \lim_{x \to c} (f(x) - g(x)) = \lim_{x \to c} \frac{1/g(x) - 1/f(x)}{1/(f(x)g(x))} \!
+$$
+
 
 
 ## 平面向量

@@ -24,7 +24,7 @@ jobs:
           find . -name '*.md' -print0 | while IFS= read -r -d '' md_file; do
           output_pdf="$(basename "$md_file" .md).pdf"
             pandoc "$md_file" -o "$output_pdf" \
-              --pdf-engine=katex \
+              --pdf-engine=pdflatex \
               -V mainfont="Noto Serif CJK SC" \
               -V sansfont="Noto Sans CJK SC" \
               -V monofont="Noto Sans Mono CJK SC" \

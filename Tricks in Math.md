@@ -90,11 +90,11 @@ $$
 
 **结论**
 
-当 $\displaystyle\lim_{x \to c}{f(x)}=\displaystyle\lim_{x \to c}{g(x)}=0$ 或 $\lim_{x \to c}{|f(x)|}=\lim_{x \to c}{|g(x)|}=\infty$ 其中一者成立，此时有
+当 $\displaystyle\lim_{x \to c}{f(x)}=\displaystyle\lim_{x \to c}{g(x)}=0$ 或 $\lim_{x \to c}{|f(x)|}=\lim_{x \to c}{|g(x)|}=\infty$ 其中一者成立，此时有
 $$
 \lim_{x \to c}\dfrac{f(x)}{g(x)}=\lim_{x\to c}\dfrac{f^{'}(x)}{g{'}(x)}
 $$
-如果式子不满足分式形式，也可以通过运算转为分数形式。
+如果式子不满足分数形式，也可以通过运算转为分数形式。
 $$
 \lim_{x \to c} f(x) = 0,\  \lim_{x \to c} g(x) = \infty\\
 \lim_{x \to c} f(x)g(x) = \lim_{x \to c} \frac{f(x)}{1/g(x)} \ 或 \ \lim_{x \to c} \frac{g(x)}{1/f(x)}
@@ -225,7 +225,7 @@ $$
 
 **证明**
 $$
-\angle ADB + \angle ADC = 180 \degree\\
+\angle ADB + \angle ADC = 180^\circ\\
 \cos \angle ADB = -\cos \angle ADC\\
 \frac{AD^2+BD^2-AB^2}{2AD \cdot BD} = -\frac{AD^2+CD^2-AC^2}{2AD \cdot CD}\\
 AB^2+AC^2=2(AD^2+BD^2)

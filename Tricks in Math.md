@@ -38,7 +38,7 @@ $\Delta=m^2+4(m-1)\geq 0 \;\Rightarrow\; m \geq 2\sqrt{2}-2$
 
 **几何级数**
 $$
-$\dfrac{1}{1-x} = \sum^{\infin}_{n=0} x^n= 1+ x +x^2+ \cdots +x^n +\cdots \quad \forall x: \left| x \right| < 1
+\dfrac{1}{1-x} = \sum^{\infin}_{n=0} x^n= 1+ x +x^2+ \cdots +x^n +\cdots \quad \forall x: \left| x \right| < 1
 $$
 **二项式级数**
 $$
@@ -54,11 +54,11 @@ $$
 $$
 **三角函数**
 $$
-\begin{align}
+\begin{aligned}
 \sin x &= \sum^{\infty}_{n=0} \cfrac{(-1)^n}{(2n+1)!} x^{2n+1} = x - \cfrac{x^3}{3!} + \cfrac{x^5}{5!} - \cdots \quad \forall x\\[6pt]
 \cos x &= \sum^{\infty}_{n=0} \cfrac{(-1)^n}{(2n)!} x^{2n} = 1 - \cfrac{x^2}{2!} + \frac{x^4}{4!} - \cdots \quad \forall x\\[6pt]
 \tan x &= \sum^{\infty}_{n=1} \frac{B_{2n} (-4)^n \left(1-4^n\right)}{(2n-1)!} x^{2n-1} = x + \cfrac{x^3}{3} + \cfrac{2 x^5}{15} + \cdots \quad \forall x:|x| < \cfrac{\pi}{2}\\[6pt]
-\end{align}
+\end{aligned}
 $$
 
 
@@ -68,17 +68,17 @@ $$
 
 **指数型**
 $$
-\begin{align}
+\begin{aligned}
 e^x&<\dfrac{2+x}{2-x} \quad \forall x<2\\
 e^x&>\dfrac{2+x}{2-x} \quad \forall x>2
-\end{align}
+\end{aligned}
 $$
 **对数型**
 $$
-\begin{align}
+\begin{aligned}
 \ln x&<\dfrac{2x-2}{1+x} \quad \forall x<1\\
 \ln x&>\dfrac{2x-2}{1+x} \quad \forall x>1
-\end{align}
+\end{aligned}
 $$
 
 
@@ -376,13 +376,13 @@ $$
 k_{OM}=\dfrac{\dfrac{y_1+y_2}{2}-0}{\dfrac{x_1+x_2}{2}-0}=\dfrac{y_1+y_2}{x_1+x_2} \\
 k_{OM}k_{AB}=-\dfrac{b^2}{a^2}
 $$
-<img src="https://s2.loli.net/2025/04/04/xmrzX2tDlQvG5Ff.png" style="zoom: 140%;" />
+<img src="https://s2.loli.net/2025/04/04/8X9V37kOGzoFY2d.png" style="zoom: 140%;" />
 
 **推论**
 
-做 $A$ 点关于原点的对称点 $A'$，由三角形中位线定理可得 $k_{BA}k_{BA^{'}}=-\dfrac{b^2}{a^2}$（注意此处的 $AA^{'}$ 需过坐标原点）
+做 $A$ 点关于原点的对称点 $A'$，由三角形中位线定理可得 $k_{BA}k_{BA^{'}}=-\dfrac{b^2}{a^2}$（注意此处的 $AA^{'}$ 需过坐标原点）
 
-<img src="https://s2.loli.net/2025/04/04/LbMf5oWRIh2UcPw.png" style="zoom: 140%;" />
+<img src="https://s2.loli.net/2025/04/04/CjRPZH8K9vrdTyV.png" style="zoom: 140%;" />
 
 
 
@@ -568,4 +568,3 @@ $$
 将 $t$ 换成 $t^{-1} $ 就可以得到 $V(3_1)=t^1+t^3-t^4$，这是右手三叶结的琼斯多项式
 
 <img src="https://s2.loli.net/2025/04/04/n2Y3IgUdZDi6NAw.png" style="zoom: 80%;" />
-

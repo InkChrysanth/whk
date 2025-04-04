@@ -272,7 +272,6 @@ y=b\sin t
 那么，经过点 $ M $，与 $x$轴夹角为 $\alpha$ 的直线可以表示为$ \begin{cases} x=x_0+t\cos \alpha \\ y=y_0+t\sin \alpha && \end{cases} $
 
 
-
 ### 角平分线定理
 
 **结论**
